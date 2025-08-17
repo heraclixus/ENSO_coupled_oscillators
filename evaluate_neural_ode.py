@@ -170,7 +170,7 @@ def plot_forecast_comparison(results: Dict, var_name: str = 'Nino34',
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
 
 
 def plot_forecast_plume(results: Dict, init_dates: List[str], var_name: str = 'Nino34',
@@ -223,7 +223,7 @@ def plot_forecast_plume(results: Dict, init_dates: List[str], var_name: str = 'N
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
 
 
 def analyze_model_components(model: torch.nn.Module, save_path: str = None):
@@ -275,7 +275,7 @@ def analyze_model_components(model: torch.nn.Module, save_path: str = None):
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
 
 
 def main():

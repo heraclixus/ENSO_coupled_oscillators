@@ -685,7 +685,7 @@ def main():
     
     plt.tight_layout()
     plt.savefig(os.path.join(model_save_dir, f'{args.model_type}{model_suffix}_{timestamp}_curves.png'))
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print(f'Training completed. Best model saved to: {save_path}')
     print(f'All outputs saved in: {model_save_dir}')

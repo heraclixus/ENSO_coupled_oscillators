@@ -315,7 +315,7 @@ def visualize_sine_dynamics(models):
     
     plt.tight_layout()
     plt.savefig('sine_graph_neural_ode_dynamics.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print(f"   ✓ Visualization saved as 'sine_graph_neural_ode_dynamics.png'")
 

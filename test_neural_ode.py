@@ -175,7 +175,7 @@ def plot_comparison(neural_ode_sim, xro_sim=None):
     
     plt.tight_layout()
     plt.savefig('neural_ode_test_results.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print("✓ Plotting completed")
 

@@ -9,3 +9,5 @@ checkpoints/
 *.wav
 *.m4a
 *.m4v
+__pycache__/
+models/__pycache__/

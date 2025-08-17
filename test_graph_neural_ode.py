@@ -299,7 +299,7 @@ def visualize_graph_dynamics(models):
     
     plt.tight_layout()
     plt.savefig('graph_neural_ode_dynamics.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print(f"   ✓ Visualization saved as 'graph_neural_ode_dynamics.png'")
 

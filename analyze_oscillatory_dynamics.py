@@ -241,7 +241,7 @@ def generate_phase_portraits(models, xro_fit, obs_data, var_names):
     
     plt.tight_layout()
     plt.savefig('phase_portraits_comparison.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
 
 
 def spectral_analysis(models, xro_fit, obs_data, var_names):
@@ -326,7 +326,7 @@ def spectral_analysis(models, xro_fit, obs_data, var_names):
     
     plt.tight_layout()
     plt.savefig('spectral_analysis_comparison.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
 
 
 def create_oscillatory_summary_table(xro_analysis, neural_analyses):
@@ -384,7 +384,7 @@ def create_oscillatory_summary_table(xro_analysis, neural_analyses):
     
     plt.tight_layout()
     plt.savefig('oscillatory_properties_table.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
 
 
 def main():

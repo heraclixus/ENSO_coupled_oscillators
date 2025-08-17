@@ -342,7 +342,7 @@ def plot_enso_skills(skills, save_path='enso_forecast_skills.png'):
     
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print(f"Plot saved to: {save_path}")
 

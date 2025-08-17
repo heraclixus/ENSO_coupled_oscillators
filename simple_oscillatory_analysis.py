@@ -164,7 +164,7 @@ def plot_eigenvalue_comparison(xro_analysis, neural_analysis):
     
     plt.tight_layout()
     plt.savefig('eigenvalue_comparison.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
 
 
 def create_oscillatory_summary(xro_analysis, neural_analysis):

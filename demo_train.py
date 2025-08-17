@@ -85,7 +85,7 @@ def quick_demo():
     
     plt.tight_layout()
     plt.savefig('demo_training_curves.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     # Test simulation
     print("\n6. Testing simulation...")
@@ -132,7 +132,7 @@ def quick_demo():
     
     plt.tight_layout()
     plt.savefig('demo_simulation_results.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     # Test forecasting
     print("\n8. Testing forecasting...")
@@ -180,7 +180,7 @@ def quick_demo():
     
     plt.tight_layout()
     plt.savefig('demo_forecast_results.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print("\n" + "="*60)
     print("DEMO COMPLETED SUCCESSFULLY! ✓")

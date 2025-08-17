@@ -243,7 +243,7 @@ def visualize_oscillatory_behavior(model, sim_result):
     
     plt.tight_layout()
     plt.savefig('oscillator_neural_ode_analysis.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print(f"✓ Visualization saved as 'oscillator_neural_ode_analysis.png'")
 

@@ -95,7 +95,7 @@ def test_noise_characteristics(model):
     
     plt.tight_layout()
     plt.savefig('stochastic_noise_characteristics.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print("✓ Noise characteristics analysis completed")
 
@@ -160,7 +160,7 @@ def test_ensemble_simulation(model):
     
     plt.tight_layout()
     plt.savefig('stochastic_ensemble_comparison.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print("✓ Ensemble simulation completed")
     
@@ -228,7 +228,7 @@ def test_forecast_comparison(model):
     
     plt.tight_layout()
     plt.savefig('stochastic_forecast_comparison.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print("✓ Stochastic forecasting completed")
 
@@ -278,7 +278,7 @@ def test_noise_scaling(model):
     
     plt.tight_layout()
     plt.savefig('stochastic_noise_scaling.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
     
     print("✓ Noise scaling test completed")
 

@@ -366,7 +366,7 @@ def plot_forecast_skill_comparison(skills, variables=['Nino34'], save_path=None)
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
 
 
 def print_model_status(models, checkpoint_map):

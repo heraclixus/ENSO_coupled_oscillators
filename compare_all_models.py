@@ -258,7 +258,7 @@ def plot_comprehensive_comparison(neural_simulations, xro_sim, spread_stats, var
     
     plt.tight_layout()
     plt.savefig('comprehensive_model_comparison.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out to avoid popup during training
 
 
 def main():

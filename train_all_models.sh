@@ -16,11 +16,11 @@ set -e  # Exit on any error
 
 # Default parameters
 EPOCHS=100
-BATCH_SIZE=32
+BATCH_SIZE=256
 DEVICE="auto"  # Will auto-detect CUDA
 TRAIN_MULTIVARIATE=true
 TRAIN_ENSO_ONLY=true
-CONDA_ENV="graph"
+CONDA_ENV="spde"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
