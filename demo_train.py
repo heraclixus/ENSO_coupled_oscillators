@@ -54,7 +54,11 @@ def quick_demo():
     # Quick training (just a few epochs for demo)
     print("\n4. Training model (demo: 5 epochs)...")
     n_epochs = 5
-    save_path = 'checkpoints/demo_physics_informed.pt'
+    
+    # Create model-specific directory for demo
+    demo_dir = 'checkpoints/demo_physics_informed'
+    os.makedirs(demo_dir, exist_ok=True)
+    save_path = os.path.join(demo_dir, 'demo_physics_informed.pt')
     
     history = trainer.train(n_epochs, save_path)
     

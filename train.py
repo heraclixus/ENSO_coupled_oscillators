@@ -286,13 +286,17 @@ class Trainer:
         
         return total_loss / max(n_batches, 1)
     
-    def train(self, n_epochs: int, save_path: str = None) -> Dict:
+    def train(self, n_epochs: int, save_path: str = None, model_type: str = None, 
+              save_dir: str = None, timestamp: str = None) -> Dict:
         """
         Train the model
         
         Args:
             n_epochs: Number of epochs to train
             save_path: Path to save the best model
+            model_type: Type of model being trained (for trajectory plotting)
+            save_dir: Directory to save additional outputs
+            timestamp: Timestamp for file naming
         Returns:
             Training history dictionary
         """
@@ -326,11 +330,130 @@ class Trainer:
                     'val_loss': val_loss,
                 }, save_path)
                 print(f'Saved best model with val_loss: {val_loss:.6f}')
+                
+                # Generate forecast trajectory plot for best model
+                if model_type and save_dir and timestamp:
+                    self.plot_forecast_trajectory(save_dir, model_type, timestamp)
         
         return {
             'train_losses': self.train_losses,
             'val_losses': self.val_losses
         }
+    
+    def plot_forecast_trajectory(self, save_dir: str, model_type: str, timestamp: str):
+        """
+        Generate and save forecast trajectory vs target trajectory plot for ENSO
+        """
+        try:
+            print("Generating forecast trajectory plot...")
+            
+            # Use a few validation samples for trajectory plotting
+            self.model.eval()
+            with torch.no_grad():
+                # Get a batch from validation loader
+                for input_seq, target_seq, time_points in self.val_loader:
+                    input_seq = input_seq.to(self.device)
+                    target_seq = target_seq.to(self.device)
+                    time_points = time_points.to(self.device)
+                    
+                    batch_size, seq_len, n_vars = input_seq.shape
+                    forecast_horizon = target_seq.shape[1]
+                    
+                    # Use last state as initial condition
+                    x0 = input_seq[:, -1, :]
+                    t_forecast = time_points[:, seq_len:]
+                    
+                    # Generate predictions for first few samples
+                    n_samples = min(3, batch_size)
+                    predictions = []
+                    
+                    for i in range(n_samples):
+                        if hasattr(self.model, 'forward') and 'enable_noise' in self.model.forward.__code__.co_varnames:
+                            pred = self.model(x0[i:i+1], t_forecast[i], enable_noise=False)
+                        else:
+                            pred = self.model(x0[i:i+1], t_forecast[i], add_noise=False)
+                        predictions.append(pred)
+                    
+                    predictions = torch.cat(predictions, dim=0)  # [n_samples, forecast_horizon, n_vars]
+                    
+                    # Plot trajectories
+                    self._create_trajectory_plot(
+                        predictions[:n_samples], 
+                        target_seq[:n_samples], 
+                        input_seq[:n_samples], 
+                        save_dir, 
+                        model_type, 
+                        timestamp
+                    )
+                    break  # Only use first batch
+                    
+        except Exception as e:
+            print(f"Warning: Could not generate trajectory plot: {e}")
+    
+    def _create_trajectory_plot(self, predictions, targets, inputs, save_dir, model_type, timestamp):
+        """Create the actual trajectory plot"""
+        import matplotlib.pyplot as plt
+        
+        # Convert to numpy
+        predictions_np = predictions.cpu().numpy()
+        targets_np = targets.cpu().numpy()
+        inputs_np = inputs.cpu().numpy()
+        
+        # Find ENSO index (Nino34)
+        var_names = getattr(self.train_loader.dataset, 'var_names', None)
+        enso_idx = 0  # Default to first variable
+        if var_names and 'Nino34' in var_names:
+            enso_idx = var_names.index('Nino34')
+        
+        n_samples, seq_len, _ = inputs_np.shape
+        forecast_horizon = predictions_np.shape[1]
+        
+        # Create plot
+        fig, axes = plt.subplots(n_samples, 1, figsize=(12, 4*n_samples))
+        if n_samples == 1:
+            axes = [axes]
+        
+        for i in range(n_samples):
+            ax = axes[i]
+            
+            # Time axes
+            input_time = np.arange(-seq_len, 0)
+            forecast_time = np.arange(0, forecast_horizon)
+            
+            # Plot input sequence (context)
+            ax.plot(input_time, inputs_np[i, :, enso_idx], 'k-', linewidth=2, 
+                   label='Input Context', alpha=0.7)
+            
+            # Plot target trajectory (truth)
+            ax.plot(forecast_time, targets_np[i, :, enso_idx], 'b-', linewidth=3,
+                   label='True Target', marker='o', markersize=4)
+            
+            # Plot predicted trajectory
+            ax.plot(forecast_time, predictions_np[i, :, enso_idx], 'r--', linewidth=3,
+                   label='Model Forecast', marker='s', markersize=4)
+            
+            # Formatting
+            ax.axvline(0, color='gray', linestyle=':', alpha=0.5, label='Forecast Start')
+            ax.axhline(0, color='gray', linestyle='-', alpha=0.3)
+            ax.axhline(0.5, color='red', linestyle='--', alpha=0.3)
+            ax.axhline(-0.5, color='blue', linestyle='--', alpha=0.3)
+            
+            ax.set_xlabel('Time (months)')
+            ax.set_ylabel('ENSO (Nino3.4) Anomaly')
+            ax.set_title(f'Sample {i+1}: Forecast vs Target Trajectory')
+            ax.legend()
+            ax.grid(True, alpha=0.3)
+        
+        plt.suptitle(f'{model_type} - ENSO Forecast Trajectory Comparison', fontsize=14, y=0.98)
+        plt.tight_layout()
+        
+        # Save plot
+        model_suffix = '_enso_only' if self.enso_only else ''
+        plot_path = os.path.join(save_dir, f'{model_type}{model_suffix}_{timestamp}_trajectory.png')
+        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        print(f"Saved trajectory plot: {plot_path}")
 
 
 def create_data_loaders(data_path: str, train_split: float = 0.8, 
@@ -403,8 +526,12 @@ def main():
     else:
         print(f'Using device: {args.device}')
     
-    # Create save directory
+    # Create save directory and model-specific subdirectory
     os.makedirs(args.save_dir, exist_ok=True)
+    model_suffix = '_enso_only' if args.enso_only else ''
+    model_save_dir = os.path.join(args.save_dir, f'{args.model_type}{model_suffix}')
+    os.makedirs(model_save_dir, exist_ok=True)
+    print(f'Created model directory: {model_save_dir}')
     
     # Create data loaders
     print('Loading data...')
@@ -528,14 +655,13 @@ def main():
     
     # Train
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    model_suffix = '_enso_only' if args.enso_only else ''
-    save_path = os.path.join(args.save_dir, f'{args.model_type}{model_suffix}_{timestamp}.pt')
+    save_path = os.path.join(model_save_dir, f'{args.model_type}{model_suffix}_{timestamp}.pt')
     
     print('Starting training...')
-    history = trainer.train(args.n_epochs, save_path)
+    history = trainer.train(args.n_epochs, save_path, args.model_type, model_save_dir, timestamp)
     
     # Save training history
-    history_path = os.path.join(args.save_dir, f'{args.model_type}{model_suffix}_{timestamp}_history.json')
+    history_path = os.path.join(model_save_dir, f'{args.model_type}{model_suffix}_{timestamp}_history.json')
     with open(history_path, 'w') as f:
         json.dump(history, f)
     
@@ -558,10 +684,11 @@ def main():
     plt.title('Training Curves (Log Scale)')
     
     plt.tight_layout()
-    plt.savefig(os.path.join(args.save_dir, f'{args.model_type}{model_suffix}_{timestamp}_curves.png'))
+    plt.savefig(os.path.join(model_save_dir, f'{args.model_type}{model_suffix}_{timestamp}_curves.png'))
     plt.show()
     
     print(f'Training completed. Best model saved to: {save_path}')
+    print(f'All outputs saved in: {model_save_dir}')
 
 
 if __name__ == '__main__':

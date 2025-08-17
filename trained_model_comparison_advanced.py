@@ -36,7 +36,9 @@ def find_checkpoint_files(checkpoint_dir='checkpoints'):
         print(f"Warning: Checkpoint directory '{checkpoint_dir}' not found!")
         return {}
     
-    checkpoint_files = glob.glob(os.path.join(checkpoint_dir, '*.pt'))
+    # Look for checkpoint files in both root directory and subdirectories
+    checkpoint_files = glob.glob(os.path.join(checkpoint_dir, '*.pt'))  # Root level (legacy)
+    checkpoint_files.extend(glob.glob(os.path.join(checkpoint_dir, '*', '*.pt')))  # Subdirectories (new structure)
     
     checkpoint_map = {}
     
